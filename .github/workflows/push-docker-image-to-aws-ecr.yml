@@ -1,0 +1,45 @@
+name: "🚀 Push Docker image to AWS ECR"
+
+permissions:
+  contents: read
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  AWS_REGION: "${{ secrets.AWS_REGION }}"
+  AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
+  AWS_ECR_REPOSITORY: "${{ vars.AWS_ECR_REPOSITORY }}"
+
+jobs:
+  build:
+    name: "Build and push docker image"
+    runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4.1.1
+        with:
+          ref: ${{ github.ref.tags }}
+      - name: "Configure AWS credentials from Develop account"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github/AWSGitHubAction
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: "Login to Amazon ECR"
+        id: "aws-ecr-login"
+        uses: aws-actions/amazon-ecr-login@v2.0.1
+
+      - name: "Build, tag, and push to Amazon ECR"
+        env:
+          ECR_REGISTRY: ${{ steps.aws-ecr-login.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.ref.tags }} .
+          docker push $ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.ref.tags }}
