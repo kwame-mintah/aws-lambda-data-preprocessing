@@ -1,23 +1,13 @@
-# Build a virtualenv using the appropriate Debian release
-# * Install python3-venv for the built-in Python3 venv module (not installed by default)
-# * Install gcc libpython3-dev to compile C Python modules
-# * In the virtualenv: Update pip setuputils and wheel to support building new packages
-FROM debian:12-slim AS build
-RUN apt-get update && \
-    apt-get install --no-install-suggests --no-install-recommends --yes python3-venv gcc libpython3-dev && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* && \
-    python3 -m venv /venv && \
-    /venv/bin/pip install --upgrade pip setuptools wheel
+FROM public.ecr.aws/lambda/python:3.11
 
-# Build the virtualenv as a separate step: Only re-execute this step when requirements.txt changes
-FROM build AS build-venv
-COPY requirements.txt /requirements.txt
-RUN /venv/bin/pip install --disable-pip-version-check -r /requirements.txt
+# Copy requirements.txt
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
 
-# Copy the virtualenv into a distroless image
-FROM gcr.io/distroless/python3-debian12:nonroot
-COPY --from=build-venv /venv /venv
-COPY . /app
-WORKDIR /app
-USER nobody
-ENTRYPOINT ["/venv/bin/python3", "data_preprocessing.py", "lambda_handler"]
+# Install the specified packages
+RUN pip install -r requirements.txt
+
+# Copy function code
+COPY . ${LAMBDA_TASK_ROOT}
+
+# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "data_preprocessing.lambda_handler" ]
