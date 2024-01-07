@@ -1,5 +1,6 @@
 # AWS Lambda Data Preprocessing
 
+[![🚧 Bump version](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/bump-repository-version.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/bump-repository-version.yml)
 [![🚀 Push Docker image to AWS ECR](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/push-docker-image-to-aws-ecr.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/push-docker-image-to-aws-ecr.yml)
 [![🧹 Run linter](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/run-linter.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/run-linter.yml)
 
@@ -15,7 +16,7 @@ Data uploaded into these buckets can be found here [ml-data-copy-to-aws-s3](http
 ### Dependencies
 
 - [Python](https://www.python.org/downloads/release/python-3110/)
-- [Docker](https://www.docker.com/products/docker-desktop/)
+- [Docker for Desktop](https://www.docker.com/products/docker-desktop/)
 - [Amazon Web Services](https://aws.amazon.com/?nc2=h_lg)
 
 ## Usage
