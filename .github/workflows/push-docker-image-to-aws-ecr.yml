@@ -4,9 +4,12 @@ permissions:
   contents: read
 
 on:
+  workflow_dispatch:
   push:
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+    branches:
+      - main
+    paths:
+      - "VERSION"
 
 env:
   AWS_REGION: "${{ secrets.AWS_REGION }}"
@@ -33,6 +36,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github/AWSGitHubAction
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: "Latest semantic versioning tag"
+        id: "semver-version"
+        run: echo "TAG_NAME=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
       - name: "Login to Amazon ECR"
         id: "aws-ecr-login"
         uses: aws-actions/amazon-ecr-login@v2.0.1
@@ -41,5 +48,5 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.aws-ecr-login.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.ref.tags }} .
-          docker push $ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.ref.tags }}
+          docker build -t $ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ steps.semver-version.outputs.TAG_NAME }} .
+          docker push $ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ steps.semver-version.outputs.TAG_NAME }}
