@@ -1,3 +1,9 @@
+## 0.2.0 (2024-01-08)
+
+### Feat
+
+- **data_preprocessing**: initial data preprocessing functions
+
 ## 0.1.0 (2024-01-06)
 
 ### Feat
