@@ -1,3 +1,9 @@
+## 0.2.1 (2024-01-14)
+
+### Refactor
+
+- **data_preprocessing**: include boto3 client as args for aws operations
+
 ## 0.2.0 (2024-01-08)
 
 ### Feat
