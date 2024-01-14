@@ -2,6 +2,7 @@ import io
 import logging
 import os  # For manipulating filepath names
 from datetime import datetime
+from typing import Any
 
 import boto3
 import pandas as pd  # For munging tabular data
@@ -68,15 +69,18 @@ def lambda_handler(event, context):
     return event
 
 
-def pre_checks_before_processing(key: str, find_tag: str) -> bool:
+def pre_checks_before_processing(
+    key: str, find_tag: str, client: Any = s3_client
+) -> bool:
     """
     Check that the object is a csv file and has not been processed previously.
 
+    :param client: boto3 client configured to use s3
     :param key: The full path for to object
     :param find_tag: Tag to find on the object
     :return: bool
     """
-    object_tags = s3_client.get_object_tagging(
+    object_tags = client.get_object_tagging(
         Bucket=PREPROCESSED_INPUT_BUCKET_NAME, Key=key
     )
     if ".csv" not in key:
@@ -88,26 +92,28 @@ def pre_checks_before_processing(key: str, find_tag: str) -> bool:
             return True
 
 
-def retrieve_and_convert_to_dataframe(key: str) -> DataFrame:
+def retrieve_and_convert_to_dataframe(key: str, client: Any = s3_client) -> DataFrame:
     """
     Get the csv file from the bucket and return as a DataFrame.
 
+    :param client: boto3 client configured to use s3
     :param key: The full path for to object
     :return: DataFrame
     """
-    s3_object = s3_client.get_object(Bucket=PREPROCESSED_INPUT_BUCKET_NAME, Key=key)
+    s3_object = client.get_object(Bucket=PREPROCESSED_INPUT_BUCKET_NAME, Key=key)
     return pd.read_csv(s3_object["Body"])
 
 
-def upload_to_output_bucket(file_obj: io.BytesIO, key: str):
+def upload_to_output_bucket(file_obj: io.BytesIO, key: str, client: Any = s3_client):
     """
     Upload the file object to the output s3 bucket.
 
+    :param client: boto3 client configured to use s3
     :param file_obj: The DataFrame as a csv
     :param key: The full path to the object destination
     :return:
     """
-    s3_client.put_object(
+    client.put_object(
         Body=file_obj,
         Bucket=PREPROCESSED_OUTPUT_BUCKET_NAME,
         Tagging="ProcessedTime=%s" % str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
@@ -115,14 +121,15 @@ def upload_to_output_bucket(file_obj: io.BytesIO, key: str):
     )
 
 
-def mark_as_processed(key: str):
+def mark_as_processed(key: str, client: Any = s3_client):
     """
     Add a tag to the csv that has now been processed.
 
+    :param client: boto3 client configured to use s3
     :param key: The full path for to object
     :return:
     """
-    s3_client.put_object_tagging(
+    client.put_object_tagging(
         Bucket=PREPROCESSED_INPUT_BUCKET_NAME,
         Tagging={
             "TagSet": [
