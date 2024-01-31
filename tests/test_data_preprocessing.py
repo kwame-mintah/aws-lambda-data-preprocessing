@@ -1,21 +1,58 @@
 import io
 
 import botocore.session
+import pandas as pd
 import pytest
 from botocore.stub import Stubber, ANY
 
+import data_preprocessing
 from data_preprocessing import (
     pre_checks_before_processing,
     retrieve_and_convert_to_dataframe,
     upload_to_output_bucket,
     mark_as_processed,
+    lambda_handler,
 )
-from exmaple_responses import (
+from example_responses import (
     example_tag_set_without_processed_time,
     example_tag_set_with_processed_time,
     example_get_object,
     example_get_put_object,
+    example_event,
 )
+
+LOCAL_TEST_FILENAME = "example-bank-file.csv"
+
+
+def test_lambda_handler(monkeypatch):
+    def checks_passed(key, find_tag):
+        """Stub checks on event"""
+        return False
+
+    def return_dataframe(key):
+        return pd.read_csv(LOCAL_TEST_FILENAME)
+
+    def uploaded_to_bucket(file_obj, key):
+        """Stub uploading to bucket"""
+        return None
+
+    def tag_applied_to_object(key):
+        """Stub adding tag to object"""
+        return None
+
+    monkeypatch.setattr(
+        data_preprocessing, "pre_checks_before_processing", checks_passed
+    )
+    monkeypatch.setattr(
+        data_preprocessing, "retrieve_and_convert_to_dataframe", return_dataframe
+    )
+    monkeypatch.setattr(
+        data_preprocessing, "upload_to_output_bucket", uploaded_to_bucket
+    )
+    monkeypatch.setattr(data_preprocessing, "mark_as_processed", tag_applied_to_object)
+
+    result = lambda_handler(example_event(), None)
+    assert result["Records"][0]["s3"]["object"]["key"] == LOCAL_TEST_FILENAME
 
 
 @pytest.mark.parametrize(
@@ -44,7 +81,7 @@ def test_retrieve_and_convert_to_dataframe():
     stubber.add_response("get_object", example_get_object(), expected_params)
 
     with stubber:
-        result = retrieve_and_convert_to_dataframe("example-bank-file.csv", s3_client)
+        result = retrieve_and_convert_to_dataframe(LOCAL_TEST_FILENAME, s3_client)
         assert result.shape[1] == 21
 
 
@@ -56,7 +93,7 @@ def test_upload_to_output_bucket():
     file_obj = io.BytesIO()
 
     with stubber:
-        result = upload_to_output_bucket(file_obj, "example-bank-file.csv", s3_client)
+        result = upload_to_output_bucket(file_obj, LOCAL_TEST_FILENAME, s3_client)
         assert result is None
 
 
@@ -67,5 +104,5 @@ def test_mark_as_processed():
     stubber.add_response("put_object_tagging", {}, expected_params)
 
     with stubber:
-        result = mark_as_processed("example-bank-file.csv", s3_client)
+        result = mark_as_processed(LOCAL_TEST_FILENAME, s3_client)
         assert result is None
