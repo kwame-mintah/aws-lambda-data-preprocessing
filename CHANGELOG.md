@@ -1,3 +1,9 @@
+## 0.2.2 (2024-01-31)
+
+### Refactor
+
+- **example_responses**: fix typo in file name
+
 ## 0.2.1 (2024-01-14)
 
 ### Refactor
