@@ -10,6 +10,12 @@ def example_tag_set_without_processed_time() -> dict:
     }
 
 
+def example_empty_tag_set() -> dict:
+    return {
+        "TagSet": [],
+    }
+
+
 def example_tag_set_with_processed_time():
     return {
         "VersionId": "string",

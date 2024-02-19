@@ -19,6 +19,7 @@ from example_responses import (
     example_get_object,
     example_get_put_object,
     example_event,
+    example_empty_tag_set,
 )
 
 LOCAL_TEST_FILENAME = "example-bank-file.csv"
@@ -56,21 +57,22 @@ def test_lambda_handler(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "a, b, expected",
+    "key, aws_response, expected",
     [
         ("incorrect.md", example_tag_set_without_processed_time(), True),
         ("correct.csv", example_tag_set_without_processed_time(), None),
-        ("correct.csv", example_tag_set_with_processed_time(), True),
+        ("correct.csv", example_empty_tag_set(), None),
+        ("correct.csv", example_tag_set_with_processed_time(), None),
     ],
 )
-def test_pre_checks_before_processing(a, b, expected):
+def test_pre_checks_before_processing(key, aws_response, expected):
     s3_client = botocore.session.get_session().create_client("s3")
     stubber = Stubber(s3_client)
     expected_params = {"Bucket": ANY, "Key": ANY}
-    stubber.add_response("get_object_tagging", b, expected_params)
+    stubber.add_response("get_object_tagging", aws_response, expected_params)
 
     with stubber:
-        result = pre_checks_before_processing(a, "ProcessedTime", s3_client)
+        result = pre_checks_before_processing(key, "ProcessedTime", s3_client)
         assert result is expected
 
 

@@ -87,9 +87,10 @@ def pre_checks_before_processing(
         logger.info("Will not process, expected object to be a csv.")
         return True
     else:
-        if find_tag in object_tags["TagSet"][0]["Key"]:
-            logger.info("Object has previously been processed.")
-            return True
+        for tag in object_tags["TagSet"]:
+            if find_tag in tag:
+                logger.info("Object has previously been processed.")
+                return True
 
 
 def retrieve_and_convert_to_dataframe(key: str, client: Any = s3_client) -> DataFrame:
