@@ -1,3 +1,9 @@
+## 0.2.4 (2024-02-19)
+
+### Refactor
+
+- **lambda_handler**: update logging statement to mention the event
+
 ## 0.2.3 (2024-02-19)
 
 ### Refactor
