@@ -28,7 +28,7 @@ def lambda_handler(event, context):
     s3_record = S3Record(event)
     logger.info(
         "Received event: %s on bucket: %s for object: %s",
-        s3_record.bucket_name,
+        s3_record.event_name,
         s3_record.bucket_name,
         s3_record.object,
     )
