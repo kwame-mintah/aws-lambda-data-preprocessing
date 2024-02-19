@@ -1,3 +1,9 @@
+## 0.2.3 (2024-02-19)
+
+### Refactor
+
+- **pre_checks_before_processing**: loop through all tags rather than checking first index
+
 ## 0.2.2 (2024-01-31)
 
 ### Refactor
