@@ -1,5 +1,6 @@
 # AWS Lambda Data Preprocessing
 
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3121/)
 [![🚧 Bump version](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/bump-repository-version.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/bump-repository-version.yml)
 [![🚀 Push Docker image to AWS ECR](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/push-docker-image-to-aws-ecr.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/push-docker-image-to-aws-ecr.yml)
 [![🧹 Run linter](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/run-linter.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/run-linter.yml)
