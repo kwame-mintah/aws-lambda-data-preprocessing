@@ -44,6 +44,8 @@ def lambda_handler(event, context):
     dataframe["not_working"] = (
         dataframe["job"].isin(["student", "retired", "unemployed"]).astype(int)
     )
+    # TODO: Convert categorical variables to sets of indicators
+
     # Drop irrelevant features
     dataframe = dataframe.drop(
         [
@@ -56,7 +58,7 @@ def lambda_handler(event, context):
         ],
         axis=1,
     )
-    logger.info("Finished preprocessing data.")
+    logger.info("Finished converting columns / removing features from data.")
     file_obj = io.BytesIO()
     dataframe.to_csv(file_obj, lineterminator="\n", index=False)
     file_obj.seek(0)
