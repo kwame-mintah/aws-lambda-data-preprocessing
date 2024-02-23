@@ -1,3 +1,9 @@
+## 0.2.5 (2024-02-23)
+
+### Refactor
+
+- **data_preprocessing**: add todo for convert catergorial variables to sets
+
 ## 0.2.4 (2024-02-19)
 
 ### Refactor
