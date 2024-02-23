@@ -10,13 +10,14 @@ uploaded will be of the same format e.g. same features, data schema etc. Actions
 data, imputing numerical values and/or categorical values etc.
 
 This repository does not create the S3 Bucket, this is created via Terraform found here [terraform-aws-machine-learning-pipeline](https://github.com/kwame-mintah/terraform-aws-machine-learning-pipeline).
-Data uploaded into these buckets can be found here [ml-data-copy-to-aws-s3](https://github.com/kwame-mintah/ml-data-copy-to-aws-s3).
+Data uploaded into these buckets can be found here [ml-data-copy-to-aws-s3](https://github.com/kwame-mintah/ml-data-copy-to-aws-s3). Additionally, data preparation is
+specific to a specific set of data found within the GitHub repository.
 
 ## Development
 
 ### Dependencies
 
-- [Python](https://www.python.org/downloads/release/python-3110/)
+- [Python](https://www.python.org/downloads/release/python-3120/)
 - [Docker for Desktop](https://www.docker.com/products/docker-desktop/)
 - [Amazon Web Services](https://aws.amazon.com/?nc2=h_lg)
 
