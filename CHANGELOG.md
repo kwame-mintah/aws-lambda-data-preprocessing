@@ -1,3 +1,9 @@
+## 0.2.6 (2024-02-24)
+
+### Refactor
+
+- **upload_to_output_bucket**: change output dir to s3 after preprocessing
+
 ## 0.2.5 (2024-02-23)
 
 ### Refactor
