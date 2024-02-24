@@ -23,6 +23,9 @@ PREPROCESSED_OUTPUT_BUCKET_NAME = os.environ.get("PREPROCESSED_OUTPUT_BUCKET_NAM
 logger = logging.getLogger("data-preprocessing")
 logger.setLevel(logging.INFO)
 
+# Output file dir
+preprocess_file_dir = "automl/{}/".format(str(datetime.now().strftime("%Y-%m-%d")))
+
 
 def lambda_handler(event, context):
     s3_record = S3Record(event)
@@ -62,7 +65,9 @@ def lambda_handler(event, context):
     file_obj = io.BytesIO()
     dataframe.to_csv(file_obj, lineterminator="\n", index=False)
     file_obj.seek(0)
-    upload_to_output_bucket(file_obj=file_obj, key=s3_record.object)
+    upload_to_output_bucket(
+        file_obj=file_obj, key=preprocess_file_dir + s3_record.object
+    )
     mark_as_processed(key=s3_record.object)
     logger.info(
         "Data preprocessing complete and uploaded to %s bucket.",
@@ -107,7 +112,9 @@ def retrieve_and_convert_to_dataframe(key: str, client: Any = s3_client) -> Data
     return pd.read_csv(s3_object["Body"])
 
 
-def upload_to_output_bucket(file_obj: io.BytesIO, key: str, client: Any = s3_client):
+def upload_to_output_bucket(
+    file_obj: io.BytesIO, key: str, client: Any = s3_client
+) -> None:
     """
     Upload the file object to the output s3 bucket.
 
@@ -124,7 +131,7 @@ def upload_to_output_bucket(file_obj: io.BytesIO, key: str, client: Any = s3_cli
     )
 
 
-def mark_as_processed(key: str, client: Any = s3_client):
+def mark_as_processed(key: str, client: Any = s3_client) -> None:
     """
     Add a tag to the csv that has now been processed.
 
