@@ -95,8 +95,7 @@ def test_upload_to_output_bucket():
     file_obj = io.BytesIO()
 
     with stubber:
-        result = upload_to_output_bucket(file_obj, LOCAL_TEST_FILENAME, s3_client)
-        assert result is None
+        assert upload_to_output_bucket(file_obj, LOCAL_TEST_FILENAME, s3_client) is None
 
 
 def test_mark_as_processed():
@@ -106,5 +105,4 @@ def test_mark_as_processed():
     stubber.add_response("put_object_tagging", {}, expected_params)
 
     with stubber:
-        result = mark_as_processed(LOCAL_TEST_FILENAME, s3_client)
-        assert result is None
+        assert mark_as_processed(LOCAL_TEST_FILENAME, s3_client) is None
