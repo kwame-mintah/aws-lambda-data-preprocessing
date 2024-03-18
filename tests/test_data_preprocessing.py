@@ -27,18 +27,27 @@ LOCAL_TEST_FILENAME = "example-bank-file.csv"
 
 def test_lambda_handler(monkeypatch):
     def checks_passed(key, find_tag):
-        """Stub checks on event"""
+        """
+        Stub checks on event
+        """
         return False
 
     def return_dataframe(key):
+        """
+        Stub return local file
+        """
         return pd.read_csv(LOCAL_TEST_FILENAME)
 
     def uploaded_to_bucket(file_obj, key):
-        """Stub uploading to bucket"""
+        """
+        Stub uploading to bucket
+        """
         return None
 
     def tag_applied_to_object(key):
-        """Stub adding tag to object"""
+        """
+        Stub adding tag to object
+        """
         return None
 
     monkeypatch.setattr(

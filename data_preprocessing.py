@@ -28,6 +28,13 @@ preprocess_file_dir = "automl/{}/".format(str(datetime.now().strftime("%Y-%m-%d"
 
 
 def lambda_handler(event, context):
+    """
+    Perform data preprocessing on new data received
+
+    :param event: AWS S3 Event received
+    :param context:
+    :return:
+    """
     s3_record = S3Record(event)
     logger.info(
         "Received event: %s on bucket: %s for object: %s",
