@@ -10,8 +10,11 @@ from pandas import DataFrame
 
 from models import S3Record
 
+# The AWS region
+aws_region = os.environ.get("AWS_REGION", "eu-west-2")
+
 # Configure S3 client
-s3_client = boto3.client("s3", region_name=os.environ.get("AWS_REGION", "eu-west-2"))
+s3_client = boto3.client("s3", region_name=aws_region)
 
 # The input bucket name
 PREPROCESSED_INPUT_BUCKET_NAME = os.environ.get("PREPROCESSED_INPUT_BUCKET_NAME")
@@ -105,6 +108,7 @@ def pre_checks_before_processing(
             if find_tag in tag:
                 logger.info("Object has previously been processed.")
                 return True
+    return False
 
 
 def retrieve_and_convert_to_dataframe(key: str, client: Any = s3_client) -> DataFrame:
@@ -142,8 +146,8 @@ def mark_as_processed(key: str, client: Any = s3_client) -> None:
     """
     Add a tag to the csv that has now been processed.
 
+    :param key: Key of the object to get.
     :param client: boto3 client configured to use s3
-    :param key: The full path for to object
     :return:
     """
     client.put_object_tagging(
@@ -158,3 +162,15 @@ def mark_as_processed(key: str, client: Any = s3_client) -> None:
         },
         Key=key,
     )
+
+
+def get_parameter_store_value(
+    name: str, client: Any = boto3.client("ssm", region_name=aws_region)
+) -> str:
+    """
+
+    :param name: The name or Amazon Resource Name (ARN) of the parameter that you want to query
+    :param client: boto3 client configured to use ssm
+    :return:
+    """
+    return client.get_parameter(Name=name, WithDecryption=False)["Parameter"]["Value"]
