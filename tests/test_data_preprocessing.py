@@ -12,6 +12,7 @@ from data_preprocessing import (
     upload_to_output_bucket,
     mark_as_processed,
     lambda_handler,
+    get_parameter_store_value,
 )
 from example_responses import (
     example_tag_set_without_processed_time,
@@ -20,6 +21,7 @@ from example_responses import (
     example_get_put_object,
     example_event,
     example_empty_tag_set,
+    example_parameters_response,
 )
 
 LOCAL_TEST_FILENAME = "example-bank-file.csv"
@@ -69,9 +71,9 @@ def test_lambda_handler(monkeypatch):
     "key, aws_response, expected",
     [
         ("incorrect.md", example_tag_set_without_processed_time(), True),
-        ("correct.csv", example_tag_set_without_processed_time(), None),
-        ("correct.csv", example_empty_tag_set(), None),
-        ("correct.csv", example_tag_set_with_processed_time(), None),
+        ("correct.csv", example_tag_set_without_processed_time(), False),
+        ("correct.csv", example_empty_tag_set(), False),
+        ("correct.csv", example_tag_set_with_processed_time(), False),
     ],
 )
 def test_pre_checks_before_processing(key, aws_response, expected):
@@ -115,3 +117,15 @@ def test_mark_as_processed():
 
     with stubber:
         assert mark_as_processed(LOCAL_TEST_FILENAME, s3_client) is None
+
+
+def test_get_parameter_store_value():
+    ssm_client = botocore.session.get_session().create_client("ssm")
+    stubber = Stubber(ssm_client)
+    expected_params = {"Name": ANY, "WithDecryption": False}
+    stubber.add_response(
+        "get_parameter", example_parameters_response(), expected_params
+    )
+
+    with stubber:
+        assert get_parameter_store_value("unit-test", ssm_client) == "string"
