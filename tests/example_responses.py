@@ -2,6 +2,10 @@ from datetime import datetime
 
 
 def example_tag_set_without_processed_time() -> dict:
+    """
+    Example response when getting tags of an object.
+    :return:
+    """
     return {
         "VersionId": "string",
         "TagSet": [
@@ -11,12 +15,20 @@ def example_tag_set_without_processed_time() -> dict:
 
 
 def example_empty_tag_set() -> dict:
+    """
+    Example object has no tags.
+    :return:
+    """
     return {
         "TagSet": [],
     }
 
 
 def example_tag_set_with_processed_time():
+    """
+    Example object with ProcessedTime tag.
+    :return:
+    """
     return {
         "VersionId": "string",
         "TagSet": [
@@ -26,6 +38,10 @@ def example_tag_set_with_processed_time():
 
 
 def example_get_object():
+    """
+    Example response of object from s3 bucket.
+    :return:
+    """
     return {
         "Body": "example-bank-file.csv",
         "DeleteMarker": True,
@@ -67,6 +83,10 @@ def example_get_object():
 
 
 def example_get_put_object():
+    """
+    Example response when putting object into bucket.
+    :return:
+    """
     return {
         "Expiration": "string",
         "ETag": "string",
@@ -86,6 +106,10 @@ def example_get_put_object():
 
 
 def example_event():
+    """
+    Example S3 event received to trigger lambda.
+    :return:
+    """
     return {
         "Records": [
             {
@@ -98,7 +122,8 @@ def example_event():
                 "requestParameters": {"sourceIPAddress": "127.0.0.1"},
                 "responseElements": {
                     "x-amz-request-id": "BY65CG6WZD6HBVX2",
-                    "x-amz-id-2": "c2La85nMEE2WBGPHBXDc5a8fd28kEpGt/QsP8n/xmbLv0ZAJeqsK/XmNcCCS+phWuVz8KP3/gn3Ql3/z7RPyC3n176rqpzvZ",
+                    "x-amz-id-2": "c2La85nMEE2WBGPHBXDc5a8fd28kEpGt/QsP8n/xmbLv0ZAJeqsK"
+                    "/XmNcCCS+phWuVz8KP3/gn3Ql3/z7RPyC3n176rqpzvZ",
                 },
                 "s3": {
                     "s3SchemaVersion": "1.0",
