@@ -4,6 +4,7 @@
 [![🚧 Bump version](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/bump-repository-version.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/bump-repository-version.yml)
 [![🚀 Push Docker image to AWS ECR](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/push-docker-image-to-aws-ecr.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/push-docker-image-to-aws-ecr.yml)
 [![🧹 Run linter](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/run-linter.yml/badge.svg)](https://github.com/kwame-mintah/aws-lambda-data-preprocessing/actions/workflows/run-linter.yml)
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
 A lambda to perform data pre-processing on new data put into an S3 bucket. An assumption has been made that new data
 uploaded will be of the same format e.g. same features, data schema etc. Actions performed not limited to removing missing
