@@ -1,3 +1,9 @@
+## 0.3.0 (2024-04-02)
+
+### Feat
+
+- **data_preprocessing**: add function to get value of parameter store
+
 ## 0.2.6 (2024-02-24)
 
 ### Refactor
