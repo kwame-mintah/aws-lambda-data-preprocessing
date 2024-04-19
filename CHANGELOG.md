@@ -1,3 +1,10 @@
+## 0.4.1 (2024-04-19)
+
+### Refactor
+
+- **upload_to_output_bucket**: no longer use env var for bucket name
+- **data_preprocessing**: remove unnecassary environment variable
+
 ## 0.4.0 (2024-04-07)
 
 ### Feat
