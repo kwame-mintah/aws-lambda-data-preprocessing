@@ -28,6 +28,13 @@ LOCAL_TEST_FILENAME = "example-bank-file.csv"
 
 
 def test_lambda_handler(monkeypatch):
+
+    def ssm_output_bucket(name):
+        """
+        Stub parameter store retrieval
+        """
+        return "value"
+
     def checks_passed(bucket_name, key, find_tag):
         """
         Stub checks on event
@@ -40,7 +47,7 @@ def test_lambda_handler(monkeypatch):
         """
         return pd.read_csv(LOCAL_TEST_FILENAME)
 
-    def uploaded_to_bucket(file_obj, key):
+    def uploaded_to_bucket(bucket_name, file_obj, key):
         """
         Stub uploading to bucket
         """
@@ -54,6 +61,9 @@ def test_lambda_handler(monkeypatch):
 
     monkeypatch.setattr(
         data_preprocessing, "pre_checks_before_processing", checks_passed
+    )
+    monkeypatch.setattr(
+        data_preprocessing, "get_parameter_store_value", ssm_output_bucket
     )
     monkeypatch.setattr(
         data_preprocessing, "retrieve_and_convert_to_dataframe", return_dataframe
@@ -110,7 +120,12 @@ def test_upload_to_output_bucket():
     file_obj = io.BytesIO()
 
     with stubber:
-        assert upload_to_output_bucket(file_obj, LOCAL_TEST_FILENAME, s3_client) is None
+        assert (
+            upload_to_output_bucket(
+                "bucket-name", file_obj, LOCAL_TEST_FILENAME, s3_client
+            )
+            is None
+        )
 
 
 def test_mark_as_processed():
