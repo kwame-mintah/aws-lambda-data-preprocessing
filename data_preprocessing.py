@@ -16,8 +16,8 @@ aws_region = os.environ.get("AWS_REGION", "eu-west-2")
 # Configure S3 client
 s3_client = boto3.client("s3", region_name=aws_region)
 
-# The output bucket name
-PREPROCESSED_OUTPUT_BUCKET_NAME = os.environ.get("PREPROCESSED_OUTPUT_BUCKET_NAME")
+# The environment the lambda is currently deployed in
+SERVERLESS_ENVIRONMENT = os.environ.get("SERVERLESS_ENVIRONMENT")
 
 # Configure logging
 logger = logging.getLogger("data-preprocessing")
@@ -25,6 +25,11 @@ logger.setLevel(logging.INFO)
 
 # Output file dir
 preprocess_file_dir = "automl/{}/".format(str(datetime.now().strftime("%Y-%m-%d")))
+
+# The output bucket ssm parameter store name
+ssm_preprocessed_output_bucket_name = "mlops-eu-west-2-{}-automl-data".format(
+    SERVERLESS_ENVIRONMENT
+)
 
 
 def lambda_handler(event, context):
@@ -80,13 +85,20 @@ def lambda_handler(event, context):
     file_obj = io.BytesIO()
     dataframe.to_csv(file_obj, lineterminator="\n", index=False)
     file_obj.seek(0)
+
+    # Upload csv to output bucket for training
+    preprocessed_output_bucket_name = get_parameter_store_value(
+        name=ssm_preprocessed_output_bucket_name
+    )
     upload_to_output_bucket(
-        file_obj=file_obj, key=preprocess_file_dir + s3_record.object
+        bucket_name=preprocessed_output_bucket_name,
+        file_obj=file_obj,
+        key=preprocess_file_dir + s3_record.object,
     )
     mark_as_processed(bucket_name=s3_record.bucket_name, key=s3_record.object)
     logger.info(
         "Data preprocessing complete and uploaded to %s bucket.",
-        PREPROCESSED_OUTPUT_BUCKET_NAME,
+        preprocessed_output_bucket_name,
     )
     return event
 
@@ -131,19 +143,20 @@ def retrieve_and_convert_to_dataframe(
 
 
 def upload_to_output_bucket(
-    file_obj: io.BytesIO, key: str, client: Any = s3_client
+    bucket_name: str, file_obj: io.BytesIO, key: str, client: Any = s3_client
 ) -> None:
     """
     Upload the file object to the output s3 bucket.
 
-    :param client: boto3 client configured to use s3
+    :param bucket_name: The bucket name to upload the object.
     :param file_obj: The DataFrame as a csv
     :param key: The full path to the object destination
+    :param client: boto3 client configured to use s3
     :return:
     """
     client.put_object(
         Body=file_obj,
-        Bucket=PREPROCESSED_OUTPUT_BUCKET_NAME,
+        Bucket=bucket_name,
         Tagging="ProcessedTime=%s" % str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
         Key=key,
     )
@@ -182,4 +195,5 @@ def get_parameter_store_value(
     :param client: boto3 client configured to use ssm
     :return: value
     """
+    logger.info("Retrieving %s from parameter store", name)
     return client.get_parameter(Name=name, WithDecryption=False)["Parameter"]["Value"]
