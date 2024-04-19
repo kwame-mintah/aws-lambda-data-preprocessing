@@ -33,7 +33,7 @@ def lambda_handler(event, context):
 
     :param event: AWS S3 Event received
     :param context:
-    :return:
+    :return: event
     """
     s3_record = S3Record(event)
     logger.info(
@@ -97,9 +97,10 @@ def pre_checks_before_processing(
     """
     Check that the object is a csv file and has not been processed previously.
 
-    :param client: boto3 client configured to use s3
+    :param bucket_name: The bucket name containing the object.
     :param key: The full path for to object
     :param find_tag: Tag to find on the object
+    :param client: boto3 client configured to use s3
     :return: bool
     """
     object_tags = client.get_object_tagging(Bucket=bucket_name, Key=key)
@@ -120,8 +121,9 @@ def retrieve_and_convert_to_dataframe(
     """
     Get the csv file from the bucket and return as a DataFrame.
 
-    :param client: boto3 client configured to use s3
+    :param bucket_name: The bucket name containing the object.
     :param key: The full path for to object
+    :param client: boto3 client configured to use s3
     :return: DataFrame
     """
     s3_object = client.get_object(Bucket=bucket_name, Key=key)
@@ -151,6 +153,7 @@ def mark_as_processed(bucket_name: str, key: str, client: Any = s3_client) -> No
     """
     Add a tag to the csv that has now been processed.
 
+    :param bucket_name: The bucket name containing the object.
     :param key: Key of the object to get.
     :param client: boto3 client configured to use s3
     :return:
@@ -173,9 +176,10 @@ def get_parameter_store_value(
     name: str, client: Any = boto3.client("ssm", region_name=aws_region)
 ) -> str:
     """
+    Get a parameter store value from AWS.
 
     :param name: The name or Amazon Resource Name (ARN) of the parameter that you want to query
     :param client: boto3 client configured to use ssm
-    :return:
+    :return: value
     """
     return client.get_parameter(Name=name, WithDecryption=False)["Parameter"]["Value"]
