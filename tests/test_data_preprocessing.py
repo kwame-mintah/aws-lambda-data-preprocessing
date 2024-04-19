@@ -28,13 +28,13 @@ LOCAL_TEST_FILENAME = "example-bank-file.csv"
 
 
 def test_lambda_handler(monkeypatch):
-    def checks_passed(key, find_tag):
+    def checks_passed(bucket_name, key, find_tag):
         """
         Stub checks on event
         """
         return False
 
-    def return_dataframe(key):
+    def return_dataframe(bucket_name, key):
         """
         Stub return local file
         """
@@ -46,7 +46,7 @@ def test_lambda_handler(monkeypatch):
         """
         return None
 
-    def tag_applied_to_object(key):
+    def tag_applied_to_object(bucket_name, key):
         """
         Stub adding tag to object
         """
@@ -83,7 +83,9 @@ def test_pre_checks_before_processing(key, aws_response, expected):
     stubber.add_response("get_object_tagging", aws_response, expected_params)
 
     with stubber:
-        result = pre_checks_before_processing(key, "ProcessedTime", s3_client)
+        result = pre_checks_before_processing(
+            "bucket-name", key, "ProcessedTime", s3_client
+        )
         assert result is expected
 
 
@@ -94,7 +96,9 @@ def test_retrieve_and_convert_to_dataframe():
     stubber.add_response("get_object", example_get_object(), expected_params)
 
     with stubber:
-        result = retrieve_and_convert_to_dataframe(LOCAL_TEST_FILENAME, s3_client)
+        result = retrieve_and_convert_to_dataframe(
+            "bucket-name", LOCAL_TEST_FILENAME, s3_client
+        )
         assert result.shape[1] == 21
 
 
@@ -116,7 +120,7 @@ def test_mark_as_processed():
     stubber.add_response("put_object_tagging", {}, expected_params)
 
     with stubber:
-        assert mark_as_processed(LOCAL_TEST_FILENAME, s3_client) is None
+        assert mark_as_processed("bucket-name", LOCAL_TEST_FILENAME, s3_client) is None
 
 
 def test_get_parameter_store_value():
