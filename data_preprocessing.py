@@ -16,9 +16,6 @@ aws_region = os.environ.get("AWS_REGION", "eu-west-2")
 # Configure S3 client
 s3_client = boto3.client("s3", region_name=aws_region)
 
-# The input bucket name
-PREPROCESSED_INPUT_BUCKET_NAME = os.environ.get("PREPROCESSED_INPUT_BUCKET_NAME")
-
 # The output bucket name
 PREPROCESSED_OUTPUT_BUCKET_NAME = os.environ.get("PREPROCESSED_OUTPUT_BUCKET_NAME")
 
@@ -45,10 +42,18 @@ def lambda_handler(event, context):
         s3_record.bucket_name,
         s3_record.object,
     )
-    if pre_checks_before_processing(s3_record.object, find_tag="ProcessedTime"):
+
+    if pre_checks_before_processing(
+        bucket_name=s3_record.bucket_name,
+        key=s3_record.object,
+        find_tag="ProcessedTime",
+    ):
         return
+
     # Load the data recently uploaded to the bucket
-    data = retrieve_and_convert_to_dataframe(key=s3_record.object)
+    data = retrieve_and_convert_to_dataframe(
+        bucket_name=s3_record.bucket_name, key=s3_record.object
+    )
     # Replace values within the dataframe
     data.replace(r"\.", "_", regex=True)
     dataframe = data.replace(r"\_$", "", regex=True)
@@ -78,7 +83,7 @@ def lambda_handler(event, context):
     upload_to_output_bucket(
         file_obj=file_obj, key=preprocess_file_dir + s3_record.object
     )
-    mark_as_processed(key=s3_record.object)
+    mark_as_processed(bucket_name=s3_record.bucket_name, key=s3_record.object)
     logger.info(
         "Data preprocessing complete and uploaded to %s bucket.",
         PREPROCESSED_OUTPUT_BUCKET_NAME,
@@ -87,7 +92,7 @@ def lambda_handler(event, context):
 
 
 def pre_checks_before_processing(
-    key: str, find_tag: str, client: Any = s3_client
+    bucket_name: str, key: str, find_tag: str, client: Any = s3_client
 ) -> bool:
     """
     Check that the object is a csv file and has not been processed previously.
@@ -97,9 +102,7 @@ def pre_checks_before_processing(
     :param find_tag: Tag to find on the object
     :return: bool
     """
-    object_tags = client.get_object_tagging(
-        Bucket=PREPROCESSED_INPUT_BUCKET_NAME, Key=key
-    )
+    object_tags = client.get_object_tagging(Bucket=bucket_name, Key=key)
     if ".csv" not in key:
         logger.info("Will not process, expected object to be a csv.")
         return True
@@ -111,7 +114,9 @@ def pre_checks_before_processing(
     return False
 
 
-def retrieve_and_convert_to_dataframe(key: str, client: Any = s3_client) -> DataFrame:
+def retrieve_and_convert_to_dataframe(
+    bucket_name: str, key: str, client: Any = s3_client
+) -> DataFrame:
     """
     Get the csv file from the bucket and return as a DataFrame.
 
@@ -119,7 +124,7 @@ def retrieve_and_convert_to_dataframe(key: str, client: Any = s3_client) -> Data
     :param key: The full path for to object
     :return: DataFrame
     """
-    s3_object = client.get_object(Bucket=PREPROCESSED_INPUT_BUCKET_NAME, Key=key)
+    s3_object = client.get_object(Bucket=bucket_name, Key=key)
     return pd.read_csv(s3_object["Body"])
 
 
@@ -142,7 +147,7 @@ def upload_to_output_bucket(
     )
 
 
-def mark_as_processed(key: str, client: Any = s3_client) -> None:
+def mark_as_processed(bucket_name: str, key: str, client: Any = s3_client) -> None:
     """
     Add a tag to the csv that has now been processed.
 
@@ -151,7 +156,7 @@ def mark_as_processed(key: str, client: Any = s3_client) -> None:
     :return:
     """
     client.put_object_tagging(
-        Bucket=PREPROCESSED_INPUT_BUCKET_NAME,
+        Bucket=bucket_name,
         Tagging={
             "TagSet": [
                 {
