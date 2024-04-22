@@ -141,7 +141,7 @@ def test_mark_as_processed():
 def test_get_parameter_store_value():
     ssm_client = botocore.session.get_session().create_client("ssm")
     stubber = Stubber(ssm_client)
-    expected_params = {"Name": ANY, "WithDecryption": False}
+    expected_params = {"Name": ANY, "WithDecryption": True}
     stubber.add_response(
         "get_parameter", example_parameters_response(), expected_params
     )
