@@ -1,3 +1,9 @@
+## 0.4.2 (2024-04-22)
+
+### Refactor
+
+- **get_parameter_store_value**: set `WithDecryption` to true
+
 ## 0.4.1 (2024-04-19)
 
 ### Refactor
