@@ -196,4 +196,4 @@ def get_parameter_store_value(
     :return: value
     """
     logger.info("Retrieving %s from parameter store", name)
-    return client.get_parameter(Name=name, WithDecryption=False)["Parameter"]["Value"]
+    return client.get_parameter(Name=name, WithDecryption=True)["Parameter"]["Value"]
