@@ -59,9 +59,9 @@ specific to a specific set of data found within the GitHub repository.
            "s3SchemaVersion": "1.0",
            "configurationId": "huh",
            "bucket": {
-             "name": "test-noverycool-2139",
+             "name": "example-bucket-name",
              "ownerIdentity": { "principalId": "ABCDEFGHIJKLMN" },
-             "arn": "arn:aws:s3:::test-noverycool-2139"
+             "arn": "arn:aws:s3:::example-bucket-name"
            },
            "object": {
              "key": "data/bank-additional.csv",
@@ -74,3 +74,21 @@ specific to a specific set of data found within the GitHub repository.
      ]
    }
    ```
+
+# Flowchart
+
+The [diagram below](https://mermaid.js.org/syntax/flowchart.html#flowcharts-basic-syntax) demonstrates what happens when the lambda is trigger, when a new `.csv` object has been uploaded to the S3 Bucket.
+
+```mermaid
+graph LR
+  S0(Start)
+  T1(Dataset transformed using Pandas)
+  T2(Upload transformed data to output bucket)
+  T3(Tag original dataset as processed)
+  E0(End)
+
+  S0-->T1
+  T1-->T2
+  T2-->T3
+  T3-->E0
+```
