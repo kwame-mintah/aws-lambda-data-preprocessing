@@ -14,6 +14,26 @@ This repository does not create the S3 Bucket, this is created via Terraform fou
 Data uploaded into these buckets can be found here [ml-data-copy-to-aws-s3](https://github.com/kwame-mintah/ml-data-copy-to-aws-s3). Additionally, data preparation is
 specific to a specific set of data found within the GitHub repository.
 
+# Flowchart
+
+The [diagram below](https://mermaid.js.org/syntax/flowchart.html#flowcharts-basic-syntax) demonstrates what happens when the lambda is trigger, when a new `.csv` object has been uploaded to the S3 Bucket.
+
+```mermaid
+graph LR
+  S0(Start)
+  T1(Pull dataset from S3 Bucket)
+  T2(Dataset transformed using Pandas)
+  T3(Upload transformed data to output bucket)
+  T4(Tag original dataset as processed)
+  E0(End)
+
+  S0-->T1
+  T1-->T2
+  T2-->T3
+  T3-->T4
+  T4-->E0
+```
+
 ## Development
 
 ### Dependencies
@@ -75,20 +95,13 @@ specific to a specific set of data found within the GitHub repository.
    }
    ```
 
-# Flowchart
+## GitHub Action (CI/CD)
 
-The [diagram below](https://mermaid.js.org/syntax/flowchart.html#flowcharts-basic-syntax) demonstrates what happens when the lambda is trigger, when a new `.csv` object has been uploaded to the S3 Bucket.
+The GitHub Action "🚀 Push Docker image to AWS ECR" will check out the repository and push a docker image to the chosen AWS ECR using
+[configure-aws-credentials](https://github.com/aws-actions/configure-aws-credentials/tree/v4.0.1/) action. The following repository secrets need to be set:
 
-```mermaid
-graph LR
-  S0(Start)
-  T1(Dataset transformed using Pandas)
-  T2(Upload transformed data to output bucket)
-  T3(Tag original dataset as processed)
-  E0(End)
-
-  S0-->T1
-  T1-->T2
-  T2-->T3
-  T3-->E0
-```
+| Secret             | Description                  |
+| ------------------ | ---------------------------- |
+| AWS_REGION         | The AWS Region.              |
+| AWS_ACCOUNT_ID     | The AWS account ID.          |
+| AWS_ECR_REPOSITORY | The AWS ECR repository name. |
