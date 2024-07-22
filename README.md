@@ -34,6 +34,12 @@ graph LR
   T4-->E0
 ```
 
+# Notice
+
+As mentioned in the project description, the code provided here is to be used for a specific dataset which is predicting
+if potential customers will engage with offers provided to them. Using various information, such as demographic, past
+interactions, and environmental factors and only target a specific set of customers with an offer.
+
 ## Development
 
 ### Dependencies
@@ -46,20 +52,22 @@ graph LR
 
 1. Build the docker image locally:
 
-   ```commandline
+   ```shell
    docker build --no-cache -t data-preprocessing:local .
    ```
 
 2. Run the docker image built:
 
-   ```commandline
+   ```shell
    docker run --platform linux/amd64 -p 9000:8080 data-preprocessing:local
    ```
 
 3. Send an event to the lambda via curl:
-   ```commandline
-   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{<REPLACE_WITH_JSON_BELOW>}'
+   ```shell
+   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{<EXPAND_BELOW_AND_REPLACE_WITH_JSON_BELOW>}'
    ```
+   <details>
+   <summary>Example AWS S3 event received</summary>
    ```json
    {
      "Records": [
@@ -84,7 +92,7 @@ graph LR
              "arn": "arn:aws:s3:::example-bucket-name"
            },
            "object": {
-             "key": "data/bank-additional.csv",
+             "key": "data/bank-additional-full.csv",
              "size": 515246,
              "eTag": "0e29c0d99c654bbe83c42097c97743ed",
              "sequencer": "00656A54CA3D69362D"
@@ -94,6 +102,7 @@ graph LR
      ]
    }
    ```
+   </details>
 
 ## GitHub Action (CI/CD)
 
@@ -101,7 +110,7 @@ The GitHub Action "🚀 Push Docker image to AWS ECR" will check out the reposit
 [configure-aws-credentials](https://github.com/aws-actions/configure-aws-credentials/tree/v4.0.1/) action. The following repository secrets need to be set:
 
 | Secret             | Description                  |
-| ------------------ | ---------------------------- |
+|--------------------|------------------------------|
 | AWS_REGION         | The AWS Region.              |
 | AWS_ACCOUNT_ID     | The AWS account ID.          |
 | AWS_ECR_REPOSITORY | The AWS ECR repository name. |
