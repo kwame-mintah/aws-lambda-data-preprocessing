@@ -1,3 +1,9 @@
+## 0.5.0 (2024-07-22)
+
+### Feat
+
+- **lambda_handler**: convert categorical variables to sets of indicators
+
 ## 0.4.2 (2024-04-22)
 
 ### Refactor
