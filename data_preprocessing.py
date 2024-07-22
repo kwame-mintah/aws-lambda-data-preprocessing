@@ -60,19 +60,18 @@ def lambda_handler(event, context):
     data = retrieve_and_convert_to_dataframe(
         bucket_name=s3_record.bucket_name, key=s3_record.object
     )
-    # Replace values within the dataframe
-    data.replace(r"\.", "_", regex=True)
-    dataframe = data.replace(r"\_$", "", regex=True)
+
     # Indicator variable to capture when pdays takes a value of 999
-    dataframe["no_previous_contact"] = dataframe["pdays"] == 999
-    dataframe["not_working"] = np.where(
+    data["no_previous_contact"] = np.where(data["pdays"] == 999, 1, 0)
+    # Indicator for individuals not actively employed
+    data["not_working"] = np.where(
         np.in1d(ar1=data["job"], ar2=["student", "retired", "unemployed"]), 1, 0
     )
     # Convert categorical variables to sets of indicators
-    dataframe = pd.get_dummies(data=data)
+    model_data = pd.get_dummies(data=data)
 
     # Drop irrelevant features
-    dataframe = dataframe.drop(
+    model_data = model_data.drop(
         [
             "duration",
             "emp.var.rate",
@@ -85,7 +84,7 @@ def lambda_handler(event, context):
     )
     logger.info("Finished converting columns / removing features from data.")
     file_obj = io.BytesIO()
-    dataframe.to_csv(path_or_buf=file_obj, lineterminator="\n", index=False)
+    model_data.to_csv(path_or_buf=file_obj, lineterminator="\n", index=False)
     file_obj.seek(0)
 
     # Upload csv to output bucket for training
