@@ -1,3 +1,9 @@
+## 0.5.2 (2024-07-22)
+
+### Refactor
+
+- **model_data**: resolve issue with incorrect converting
+
 ## 0.5.1 (2024-07-22)
 
 ### Refactor
