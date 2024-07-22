@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any
 
 import boto3
+import numpy as np
 import pandas as pd  # For munging tabular data
 from pandas import DataFrame
 
@@ -14,7 +15,7 @@ from models import S3Record
 aws_region = os.environ.get("AWS_REGION", "eu-west-2")
 
 # Configure S3 client
-s3_client = boto3.client("s3", region_name=aws_region)
+s3_client = boto3.client(service_name="s3", region_name=aws_region)
 
 # The environment the lambda is currently deployed in
 SERVERLESS_ENVIRONMENT = os.environ.get("SERVERLESS_ENVIRONMENT")
@@ -62,12 +63,13 @@ def lambda_handler(event, context):
     # Replace values within the dataframe
     data.replace(r"\.", "_", regex=True)
     dataframe = data.replace(r"\_$", "", regex=True)
-    # Add two new indicators
-    dataframe["no_previous_contact"] = (dataframe["pdays"] == 999).astype(int)
-    dataframe["not_working"] = (
-        dataframe["job"].isin(["student", "retired", "unemployed"]).astype(int)
+    # Indicator variable to capture when pdays takes a value of 999
+    dataframe["no_previous_contact"] = dataframe["pdays"] == 999
+    dataframe["not_working"] = np.where(
+        np.in1d(ar1=data["job"], ar2=["student", "retired", "unemployed"]), 1, 0
     )
-    # TODO: Convert categorical variables to sets of indicators
+    # Convert categorical variables to sets of indicators
+    dataframe = pd.get_dummies(data=data)
 
     # Drop irrelevant features
     dataframe = dataframe.drop(
@@ -83,7 +85,7 @@ def lambda_handler(event, context):
     )
     logger.info("Finished converting columns / removing features from data.")
     file_obj = io.BytesIO()
-    dataframe.to_csv(file_obj, lineterminator="\n", index=False)
+    dataframe.to_csv(path_or_buf=file_obj, lineterminator="\n", index=False)
     file_obj.seek(0)
 
     # Upload csv to output bucket for training
@@ -186,7 +188,7 @@ def mark_as_processed(bucket_name: str, key: str, client: Any = s3_client) -> No
 
 
 def get_parameter_store_value(
-    name: str, client: Any = boto3.client("ssm", region_name=aws_region)
+    name: str, client: Any = boto3.client(service_name="ssm", region_name=aws_region)
 ) -> str:
     """
     Get a parameter store value from AWS.
