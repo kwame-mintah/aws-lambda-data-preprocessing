@@ -1,3 +1,9 @@
+## 0.5.1 (2024-07-22)
+
+### Refactor
+
+- **lambda_handler**: remove unneeded replace on dataframe
+
 ## 0.5.0 (2024-07-22)
 
 ### Feat
