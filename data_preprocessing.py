@@ -68,7 +68,7 @@ def lambda_handler(event, context):
         np.in1d(ar1=data["job"], ar2=["student", "retired", "unemployed"]), 1, 0
     )
     # Convert categorical variables to sets of indicators
-    model_data = pd.get_dummies(data=data)
+    model_data = pd.get_dummies(data=data, dtype=float)
 
     # Drop irrelevant features
     model_data = model_data.drop(
@@ -88,9 +88,7 @@ def lambda_handler(event, context):
     file_obj.seek(0)
 
     # Upload csv to output bucket for training
-    preprocessed_output_bucket_name = get_parameter_store_value(
-        name=ssm_preprocessed_output_bucket_name
-    )
+    preprocessed_output_bucket_name = "test-noverycool-2139"
     upload_to_output_bucket(
         bucket_name=preprocessed_output_bucket_name,
         file_obj=file_obj,
