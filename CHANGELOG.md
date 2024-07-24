@@ -1,3 +1,9 @@
+## 0.5.3 (2024-07-24)
+
+### Refactor
+
+- **preprocessed_output_bucket_name**: revert hardcoded bucket name
+
 ## 0.5.2 (2024-07-22)
 
 ### Refactor
