@@ -88,7 +88,9 @@ def lambda_handler(event, context):
     file_obj.seek(0)
 
     # Upload csv to output bucket for training
-    preprocessed_output_bucket_name = "test-noverycool-2139"
+    preprocessed_output_bucket_name = get_parameter_store_value(
+        name=ssm_preprocessed_output_bucket_name
+    )
     upload_to_output_bucket(
         bucket_name=preprocessed_output_bucket_name,
         file_obj=file_obj,
