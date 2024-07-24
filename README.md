@@ -40,6 +40,9 @@ As mentioned in the project description, the code provided here is to be used fo
 if potential customers will engage with offers provided to them. Using various information, such as demographic, past
 interactions, and environmental factors and only target a specific set of customers with an offer.
 
+Data pre-processing if done incorrectly is one of the biggest risk in every machine learning project. Please ensure that
+enough time is taken and the data received is properly understood before attempting to automate the process.
+
 ## Development
 
 ### Dependencies
