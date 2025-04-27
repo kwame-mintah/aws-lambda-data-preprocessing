@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 
 
 def example_tag_set_without_processed_time() -> dict:
@@ -43,7 +44,7 @@ def example_get_object():
     :return:
     """
     return {
-        "Body": "example-bank-file.csv",
+        "Body": str(Path(__file__).parent / "example-bank-file.csv"),
         "DeleteMarker": True,
         "AcceptRanges": "string",
         "Expiration": "string",
