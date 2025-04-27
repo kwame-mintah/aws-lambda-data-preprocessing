@@ -1,4 +1,5 @@
 import io
+from pathlib import Path
 
 import botocore.session
 import pandas as pd
@@ -24,7 +25,7 @@ from example_responses import (
     example_parameters_response,
 )
 
-LOCAL_TEST_FILENAME = "example-bank-file.csv"
+LOCAL_TEST_FILENAME = str(Path("example-bank-file.csv").absolute())
 
 
 def test_lambda_handler(monkeypatch):
@@ -74,7 +75,7 @@ def test_lambda_handler(monkeypatch):
     monkeypatch.setattr(data_preprocessing, "mark_as_processed", tag_applied_to_object)
 
     result = lambda_handler(example_event(), None)
-    assert result["Records"][0]["s3"]["object"]["key"] == LOCAL_TEST_FILENAME
+    assert result["Records"][0]["s3"]["object"]["key"] == "example-bank-file.csv"
 
 
 @pytest.mark.parametrize(
