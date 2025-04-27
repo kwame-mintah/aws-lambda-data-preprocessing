@@ -25,7 +25,7 @@ from example_responses import (
     example_parameters_response,
 )
 
-LOCAL_TEST_FILENAME = str(Path("example-bank-file.csv").absolute())
+LOCAL_TEST_FILENAME = str(Path(__file__).parent / "example-bank-file.csv")
 
 
 def test_lambda_handler(monkeypatch):
